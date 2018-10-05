@@ -154,7 +154,7 @@ class TwoLayerNet(object):
             reg=1e-5, num_iters=100,
             batch_size=200, verbose=False):
     """
-    Train this neural network using stochastic gradient descent.
+    Train this neural network using (mini-batch) stochastic gradient descent.
 
     Inputs:
     - X: A numpy array of shape (N, D) giving training data.
@@ -190,9 +190,9 @@ class TwoLayerNet(object):
       #X_batch = X[idx, :]
       #y_batch = y[idx]
     
-      shuffle_indexes = np.arange(N)
-      np.random.shuffle(shuffle_indexes)
-      shuffle_indexes = shuffle_indexes[0:batch_size-1]
+      indices = np.arange(N)
+      np.random.shuffle(indices)
+      batch_indexes = shuffle_indexes[0:batch_size-1]
       X_batch = X[shuffle_indexes, :]
       y_batch = y[shuffle_indexes]
       #########################################################################
