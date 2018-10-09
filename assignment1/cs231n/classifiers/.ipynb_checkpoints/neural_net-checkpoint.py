@@ -151,7 +151,7 @@ class TwoLayerNet(object):
 
   def train(self, X, y, X_val, y_val,
             learning_rate=1e-3, learning_rate_decay=0.95,
-            reg=1e-5, num_iters=100,
+            reg=1e-5, num_epochs=10,
             batch_size=200, verbose=False):
     """
     Train this neural network using (mini-batch) stochastic gradient descent.
@@ -172,13 +172,16 @@ class TwoLayerNet(object):
     """
     N, D = X.shape
     iterations_per_epoch = max(N / batch_size, 1)
+    
+    num_total_iters = int(iterations_per_epoch * num_epochs)
 
     # Use SGD to optimize the parameters in self.model
     loss_history = []
     train_acc_history = []
     val_acc_history = []
 
-    for it in range(num_iters):
+    for it in range(num_total_iters):
+        
       X_batch = None
       y_batch = None 
 
@@ -186,15 +189,15 @@ class TwoLayerNet(object):
       # TODO: Create a random minibatch of training data and labels, storing  #
       # them in X_batch and y_batch respectively.                             #
       #########################################################################
-      #idx = np.random.choice(N, 4, replace=True)
-      #X_batch = X[idx, :]
-      #y_batch = y[idx]
     
       indices = np.arange(N)
       np.random.shuffle(indices)
-      batch_indexes = shuffle_indexes[0:batch_size-1]
-      X_batch = X[shuffle_indexes, :]
-      y_batch = y[shuffle_indexes]
+    
+      batch_indices = indices[0:batch_size-1]
+        
+      X_batch = X[batch_indices, :]
+      y_batch = y[batch_indices]
+        
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
@@ -220,7 +223,7 @@ class TwoLayerNet(object):
       #########################################################################
 
       if verbose and it % 100 == 0:
-        print('iteration %d / %d: loss %f' % (it, num_iters, loss))
+        print('iteration %d / %d: loss %f' % (it, num_total_iters, loss))
 
       # Every epoch, check train and val accuracy and decay learning rate.
       if it % iterations_per_epoch == 0:
