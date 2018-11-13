@@ -29,7 +29,42 @@ def softmax_loss_naive(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+
+  # compute the loss and the gradient
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+
+  scores = np.zeros((1,num_classes))
+  exp_scores = np.zeros_like(scores)
+
+  data_loss = 0.0
+  reg_loss = 0.0
+
+  for i in range(num_train):
+
+    scores = np.matmul(X[i],W) # for one example of training data
+    exp_scores = np.exp(scores)
+
+    for j in range(num_classes):
+
+      if j==y[i]:
+
+          data_loss -= np.log(exp_scores[j]/ sum(exp_scores))
+          dW[:,j] -= X[i]
+
+
+      dW[:,j] += (exp_scores[j]/ sum(exp_scores)) * X[i]
+
+  # Right now the loss is a sum over all training examples, but we want it
+  # to be an average instead so we divide by num_train.
+  data_loss /= num_train
+  dW /= num_train
+
+  # Add regularization to the loss.
+  reg_loss = reg * np.sum(W * W)
+  loss = data_loss + reg_loss
+
+  dW += reg * 2 * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -53,7 +88,33 @@ def softmax_loss_vectorized(W, X, y, reg):
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  # compute the loss and the gradient
+  num_classes = W.shape[1]
+  num_train = X.shape[0]
+
+  scores = np.zeros((num_train,num_classes))
+  exp_scores = np.zeros_like(scores)
+
+  data_loss_vector = 0.0
+  reg_loss = 0.0
+
+  scores = np.matmul(X,W)
+  exp_scores = np.exp(scores)
+  norm_exp_scores = exp_scores/np.sum(exp_scores,axis=1,keepdims=True)
+
+  data_loss_vector = -np.log(norm_exp_scores[range(X.shape[0]),y])
+  data_loss = np.sum(data_loss_vector) / num_train
+
+
+  norm_exp_scores[range(num_train),y] -= 1
+  dW = np.matmul(X.T,norm_exp_scores)
+  dW /= num_train
+
+  # Add regularization to the loss.
+  reg_loss = reg * np.sum(W * W)
+  loss = data_loss + reg_loss
+
+  dW += reg * 2 * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
